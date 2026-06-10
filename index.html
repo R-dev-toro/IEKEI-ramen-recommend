@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iekei Ramen — Find Your Perfect Bowl</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --soy: #2C1A0E;
+    --broth: #C8742A;
+    --broth-light: #E8943A;
+    --noren: #8B1A1A;
+    --steam: #F5F0E8;
+    --gold: #D4A843;
+    --cream: #FAF6F0;
+  }
+
+  body {
+    background: var(--soy);
+    font-family: 'Inter', sans-serif;
+    color: var(--steam);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(200,116,42,.04) 40px, rgba(200,116,42,.04) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(200,116,42,.04) 40px, rgba(200,116,42,.04) 41px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  header {
+    text-align: center;
+    padding: 52px 0 36px;
+  }
+
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--broth);
+    margin-bottom: 12px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--steam);
+  }
+
+  header h1 span { color: var(--broth); }
+
+  .header-sub {
+    margin-top: 12px;
+    font-size: 13px;
+    color: rgba(245,240,232,.55);
+    line-height: 1.7;
+  }
+
+  .bowl-stage {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 36px;
+  }
+
+  .bowl-svg {
+    width: 200px;
+    height: 160px;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,.5));
+  }
+
+  .steam-path {
+    animation: steamRise 2.5s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  .steam-path:nth-child(2) { animation-delay: .5s; }
+  .steam-path:nth-child(3) { animation-delay: 1s; }
+
+  @keyframes steamRise {
+    0%   { opacity: 0; transform: translateY(0) scaleX(1); }
+    30%  { opacity: .6; }
+    100% { opacity: 0; transform: translateY(-22px) scaleX(1.3); }
+  }
+
+  #oil-surface { transition: opacity .6s ease; }
+
+  .progress-track {
+    height: 3px;
+    background: rgba(245,240,232,.12);
+    border-radius: 2px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--broth), var(--gold));
+    border-radius: 2px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .question-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(200,116,42,.2);
+    border-radius: 16px;
+    padding: 36px 32px;
+    display: none;
+    animation: fadeUp .45s ease both;
+  }
+
+  .question-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-step {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--broth);
+    margin-bottom: 10px;
+  }
+
+  .q-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--steam);
+    line-height: 1.3;
+  }
+
+  .q-hint {
+    font-size: 12px;
+    color: rgba(245,240,232,.45);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: rgba(255,255,255,.05);
+    border: 1.5px solid rgba(200,116,42,.25);
+    border-radius: 12px;
+    padding: 18px 22px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .22s ease;
+    color: var(--steam);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .option-btn:hover {
+    border-color: var(--broth);
+    background: rgba(200,116,42,.1);
+    transform: translateX(4px);
+  }
+
+  .option-btn.selected {
+    border-color: var(--gold);
+    background: rgba(200,116,42,.18);
+  }
+
+  .option-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+  }
+
+  .option-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .option-text span {
+    font-size: 12px;
+    color: rgba(245,240,232,.5);
+    line-height: 1.5;
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    color: rgba(245,240,232,.4);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color .2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-back:hover { color: var(--steam); }
+  .btn-back:disabled { visibility: hidden; }
+
+  .btn-next {
+    background: linear-gradient(135deg, var(--broth), var(--noren));
+    border: none;
+    border-radius: 10px;
+    padding: 13px 32px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    cursor: pointer;
+    transition: all .22s ease;
+    opacity: .4;
+    pointer-events: none;
+  }
+
+  .btn-next.enabled { opacity: 1; pointer-events: auto; }
+
+  .btn-next.enabled:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200,116,42,.4);
+  }
+
+  .result-card {
+    display: none;
+    animation: fadeUp .5s ease both;
+  }
+
+  .result-card.active { display: block; }
+
+  .result-header {
+    text-align: center;
+    padding: 0 0 32px;
+  }
+
+  .result-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--broth), var(--gold));
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .result-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 900;
+    line-height: 1.3;
+  }
+
+  .result-header p {
+    margin-top: 10px;
+    font-size: 13px;
+    color: rgba(245,240,232,.55);
+    line-height: 1.7;
+  }
+
+  .order-card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(200,116,42,.3);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .order-title {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--broth);
+    margin-bottom: 20px;
+  }
+
+  .order-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(245,240,232,.07);
+  }
+
+  .order-row:last-child { border-bottom: none; }
+
+  .order-label {
+    font-size: 12px;
+    color: rgba(245,240,232,.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .order-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+  }
+
+  .tip-card {
+    background: rgba(139,26,26,.15);
+    border: 1px solid rgba(139,26,26,.35);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+
+  .tip-card h3 {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #E87C7C;
+    margin-bottom: 12px;
+  }
+
+  .tip-card p {
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(245,240,232,.7);
+  }
+
+  .btn-restart {
+    display: block;
+    width: 100%;
+    background: none;
+    border: 1.5px solid rgba(200,116,42,.4);
+    border-radius: 12px;
+    padding: 15px;
+    color: var(--broth-light);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all .22s;
+    margin-top: 8px;
+  }
+
+  .btn-restart:hover {
+    background: rgba(200,116,42,.1);
+    border-color: var(--broth);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 11px;
+    color: rgba(245,240,232,.2);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 480px) {
+    .question-card { padding: 24px 20px; }
+    .order-card, .tip-card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <header>
+    <p class="header-label">Yokohama Iekei Style</p>
+    <h1>Find Your Perfect<br><span>Iekei Ramen</span> Bowl</h1>
+    <p class="header-sub">First time trying Iekei-style ramen?<br>Answer four quick questions and we'll find the ideal bowl for you.</p>
+  </header>
+
+  <div class="bowl-stage">
+    <svg class="bowl-svg" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+      <g opacity=".7">
+        <path class="steam-path" d="M80 40 Q76 30 80 20 Q84 10 80 0" stroke="#F5F0E8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path class="steam-path" d="M100 38 Q96 28 100 18 Q104 8 100 0" stroke="#F5F0E8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path class="steam-path" d="M120 40 Q116 30 120 20 Q124 10 120 0" stroke="#F5F0E8" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+      <ellipse cx="100" cy="58" rx="80" ry="18" fill="#4A2C1A"/>
+      <path d="M20 58 Q30 130 100 138 Q170 130 180 58 Z" fill="#3A1E0E"/>
+      <ellipse cx="100" cy="58" rx="78" ry="16" fill="#8B4A1A"/>
+      <ellipse id="oil-surface" cx="100" cy="58" rx="76" ry="14" fill="url(#oilGrad)" opacity="0.5"/>
+      <path d="M55 62 Q70 58 85 62 Q100 66 115 62 Q130 58 145 62" stroke="#E8C87A" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <path d="M60 68 Q75 65 90 68 Q105 71 120 68 Q135 65 140 68" stroke="#E8C87A" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.45"/>
+      <ellipse cx="68" cy="55" rx="10" ry="5" fill="#2D6A2D" opacity="0.8" transform="rotate(-15 68 55)"/>
+      <rect x="128" y="46" width="14" height="20" rx="2" fill="#1A2A1A" opacity="0.9"/>
+      <ellipse cx="100" cy="52" rx="14" ry="9" fill="#C84A1A" opacity="0.85"/>
+      <ellipse cx="100" cy="52" rx="10" ry="6" fill="#E86A3A" opacity="0.7"/>
+      <ellipse cx="100" cy="58" rx="80" ry="18" fill="none" stroke="#6A3A1A" stroke-width="2"/>
+      <defs>
+        <radialGradient id="oilGrad" cx="40%" cy="40%">
+          <stop offset="0%" stop-color="#F0C060" stop-opacity="0.8"/>
+          <stop offset="60%" stop-color="#C8742A" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#8B4A1A" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <!-- Q1: Noodle Firmness -->
+  <div class="question-card active" id="q1">
+    <p class="q-step">Question 1 of 4</p>
+    <h2 class="q-title">How firm do you like your noodles?</h2>
+    <p class="q-hint">Iekei ramen uses thick, flat noodles. Firmness changes how they feel and how well they hold up in the rich broth.</p>
+    <div class="options">
+      <button class="option-btn" onclick="select(1, 'firm', this)">
+        <span class="option-icon">💪</span>
+        <span class="option-text">
+          <strong>Firm (Katame)</strong>
+          <span>Great chewy bite. Holds up longer in broth and soaks up flavor without going soggy.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(1, 'normal', this)">
+        <span class="option-icon">🍜</span>
+        <span class="option-text">
+          <strong>Normal (Futsuu)</strong>
+          <span>The shop's recommended setting — a well-balanced texture that works with any broth strength.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(1, 'soft', this)">
+        <span class="option-icon">🌸</span>
+        <span class="option-text">
+          <strong>Soft (Yawarakame)</strong>
+          <span>Tender and pillowy. The broth seeps in deeply for a more unified flavor in every bite.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" disabled>← Back</button>
+      <button class="btn-next" id="next1" onclick="next(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Q2: Saltiness -->
+  <div class="question-card" id="q2">
+    <p class="q-step">Question 2 of 4</p>
+    <h2 class="q-title">How salty do you like your broth?</h2>
+    <p class="q-hint">The soy-based broth can be dialed up or down. This affects how bold and intense the overall flavor feels.</p>
+    <div class="options">
+      <button class="option-btn" onclick="select(2, 'light', this)">
+        <span class="option-icon">🕊️</span>
+        <span class="option-text">
+          <strong>Light (Usume)</strong>
+          <span>Lets the natural umami of chicken and pork shine. Mellow but still deeply savory.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(2, 'normal', this)">
+        <span class="option-icon">⚖️</span>
+        <span class="option-text">
+          <strong>Normal (Futsuu)</strong>
+          <span>The kitchen's golden balance — exactly how the chef intended it to taste.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(2, 'extra', this)">
+        <span class="option-icon">🔥</span>
+        <span class="option-text">
+          <strong>Extra (Koime)</strong>
+          <span>Bold and punchy. Pairs perfectly with a side of rice to balance the intensity.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(1)">← Back</button>
+      <button class="btn-next" id="next2" onclick="next(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Q3: Oil Level -->
+  <div class="question-card" id="q3">
+    <p class="q-step">Question 3 of 4</p>
+    <h2 class="q-title">How much chicken oil do you want?</h2>
+    <p class="q-hint">Iekei broth uses tori-abura (chicken oil) for richness. More oil means a richer, more powerful bowl.</p>
+    <div class="options">
+      <button class="option-btn" onclick="select(3, 'less', this)">
+        <span class="option-icon">💧</span>
+        <span class="option-text">
+          <strong>Less (Sukuname)</strong>
+          <span>Clean and lighter on the palate. The broth's base flavors come through more clearly.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(3, 'normal', this)">
+        <span class="option-icon">✨</span>
+        <span class="option-text">
+          <strong>Normal (Futsuu)</strong>
+          <span>A pleasant aroma and silky richness — the standard amount most regulars order.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(3, 'extra', this)">
+        <span class="option-icon">🌊</span>
+        <span class="option-text">
+          <strong>Extra (Oome)</strong>
+          <span>Maximum richness and depth. A serious, indulgent bowl for those who love it heavy.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(2)">← Back</button>
+      <button class="btn-next" id="next3" onclick="next(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Q4: Rice -->
+  <div class="question-card" id="q4">
+    <p class="q-step">Question 4 of 4</p>
+    <h2 class="q-title">Would you like a side of rice?</h2>
+    <p class="q-hint">Free rice is a beloved Iekei tradition. Pour the leftover broth over it for a soul-warming finish.</p>
+    <div class="options">
+      <button class="option-btn" onclick="select(4, 'with', this)">
+        <span class="option-icon">🍚</span>
+        <span class="option-text">
+          <strong>Yes, with rice</strong>
+          <span>The full Iekei experience. Dip your nori in broth, wrap it around the rice, and enjoy two meals in one.</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="select(4, 'not', this)">
+        <span class="option-icon">🚫</span>
+        <span class="option-text">
+          <strong>No rice, just the ramen</strong>
+          <span>Pure focus on the bowl itself — perfect if you're watching portions or simply love the noodles.</span>
+        </span>
+      </button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="back(3)">← Back</button>
+      <button class="btn-next" id="next4" onclick="showResult()">See My Bowl 🍜</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-card" id="result">
+    <div class="result-header">
+      <div class="result-badge">Your Order</div>
+      <h2 id="result-title">Your Perfect Bowl Is Ready</h2>
+      <p id="result-desc"></p>
+    </div>
+
+    <div class="order-card">
+      <p class="order-title">🍜 Order Sheet</p>
+      <div class="order-row">
+        <span class="order-label">🍜 Noodle firmness</span>
+        <span class="order-value" id="r-noodle"></span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">🧂 Saltiness</span>
+        <span class="order-value" id="r-salt"></span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">✨ Oil level</span>
+        <span class="order-value" id="r-oil"></span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">🍚 Rice</span>
+        <span class="order-value" id="r-rice"></span>
+      </div>
+    </div>
+
+    <div class="tip-card">
+      <h3>🎌 How to Enjoy It</h3>
+      <p id="result-tip"></p>
+    </div>
+
+    <button class="btn-restart" onclick="restart()">↺ Start Over</button>
+  </div>
+
+  <footer>© Iekei Ramen Guide &nbsp;·&nbsp; Yokohama Style · First-Timer's Companion</footer>
+</div>
+
+<script>
+  const answers = { 1: null, 2: null, 3: null, 4: null };
+  let current = 1;
+
+  function select(q, val, btn) {
+    answers[q] = val;
+    const card = document.getElementById('q' + q);
+    card.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('next' + q).classList.add('enabled');
+    updateBowl();
+  }
+
+  function next(n) {
+    document.getElementById('q' + (n - 1)).classList.remove('active');
+    document.getElementById('q' + n).classList.add('active');
+    current = n;
+    updateProgress();
+  }
+
+  function back(n) {
+    document.getElementById('q' + (n + 1)).classList.remove('active');
+    document.getElementById('q' + n).classList.add('active');
+    current = n;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = ((current - 1) / 4) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function updateBowl() {
+    const oil = document.getElementById('oil-surface');
+    if (answers[3] === 'less')   oil.setAttribute('opacity', '0.2');
+    if (answers[3] === 'normal') oil.setAttribute('opacity', '0.5');
+    if (answers[3] === 'extra')  oil.setAttribute('opacity', '0.85');
+  }
+
+  const labels = {
+    noodle: { firm: 'Firm', normal: 'Normal', soft: 'Soft' },
+    salt:   { light: 'Light', normal: 'Normal', extra: 'Extra' },
+    oil:    { less: 'Less', normal: 'Normal', extra: 'Extra' },
+    rice:   { with: 'With rice', not: 'No rice' }
+  };
+
+  const profiles = {
+    'normal-normal-normal-with': {
+      title: 'The Classic Iekei Bowl',
+      desc: 'Textbook Iekei — perfectly balanced and exactly how most regulars order it. The ideal starting point to truly taste the shop\'s craft.',
+      tip: 'Start with a sip of the broth before touching anything else. Dip the nori (seaweed) in the broth until soft, then wrap it around a mouthful of rice. Finish by pouring the remaining broth over your rice for a warming soup-rice finale.'
+    },
+    default_light: {
+      title: 'The Light & Clean Bowl',
+      desc: 'A gentler, more approachable bowl that lets the natural umami of chicken and pork speak for itself. Great for first-timers easing into the style.',
+      tip: 'Iekei broth is built on three layers: chicken bone, pork bone, and soy sauce. Take a slow first sip to catch all three. The nori is fantastic dipped into the broth — it transforms completely.'
+    },
+    default_heavy: {
+      title: 'The Power Bowl',
+      desc: 'A full-throttle, deeply rich bowl built for maximum satisfaction. The extra oil and salt turn this into a genuine showstopper — especially alongside rice.',
+      tip: 'Try the nori wrap move: soak a sheet in broth, then use it to pick up a clump of rice like a taco. Pour leftover broth over any remaining rice for a decadent finish. Garlic paste on the table is worth a small dab too.'
+    },
+    default: {
+      title: 'Your Custom Iekei Bowl',
+      desc: 'A one-of-a-kind bowl dialed in to your exact preferences. This combination might just become your go-to order every time.',
+      tip: 'The nori (dark seaweed sheet) is best soaked in the broth before eating — it goes from crispy to silky and takes on the full depth of the soup. If the table has ginger or garlic paste, a small amount can elevate the bowl further.'
+    }
+  };
+
+  function showResult() {
+    document.getElementById('q4').classList.remove('active');
+
+    const key = `${answers[1]}-${answers[2]}-${answers[3]}-${answers[4]}`;
+    let profile = profiles[key] || (
+      answers[2] === 'light' && answers[3] === 'less' ? profiles.default_light :
+      answers[2] === 'extra' && answers[3] === 'extra' ? profiles.default_heavy :
+      profiles.default
+    );
+
+    document.getElementById('r-noodle').textContent = labels.noodle[answers[1]];
+    document.getElementById('r-salt').textContent   = labels.salt[answers[2]];
+    document.getElementById('r-oil').textContent    = labels.oil[answers[3]];
+    document.getElementById('r-rice').textContent   = labels.rice[answers[4]];
+    document.getElementById('result-title').textContent = profile.title;
+    document.getElementById('result-desc').textContent  = profile.desc;
+    document.getElementById('result-tip').textContent   = profile.tip;
+
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('result').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function restart() {
+    Object.keys(answers).forEach(k => answers[k] = null);
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.btn-next').forEach(b => b.classList.remove('enabled'));
+    document.getElementById('result').classList.remove('active');
+    document.getElementById('q1').classList.add('active');
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('oil-surface').setAttribute('opacity', '0.5');
+    current = 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
